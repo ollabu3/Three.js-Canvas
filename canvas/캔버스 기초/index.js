@@ -14,16 +14,31 @@ const dpr = window.devicePixelRatio;
 1. 직접 css로 작업
 2. method 이용
 */
+let canvasWidth;
+let canvasHeight;
+let particles;
 
-const canvasWidth = innerWidth; // 전체화면으로 초기화
-const canvasHeight = innerHeight;
+function init() {
+  canvasWidth = innerWidth; // 전체화면으로 초기화
+  canvasHeight = innerHeight;
 
-canvas.style.width = canvasWidth + "px";
-canvas.style.height = canvasHeight + "px";
+  canvas.style.width = canvasWidth + "px";
+  canvas.style.height = canvasHeight + "px";
 
-canvas.width = canvasWidth * dpr;
-canvas.height = canvasHeight * dpr;
-ctx.scale(dpr, dpr);
+  canvas.width = canvasWidth * dpr;
+  canvas.height = canvasHeight * dpr;
+  ctx.scale(dpr, dpr);
+  particles = [];
+  const TOTAL = canvasWidth / 10;
+  for (let i = 0; i < TOTAL; i++) {
+    const x = randomNumBetween(0, canvasWidth);
+    const y = randomNumBetween(0, canvasHeight);
+    const radius = randomNumBetween(50, 100);
+    const vy = randomNumBetween(1, 5);
+    const particle = new Particle(x, y, radius, vy);
+    particles.push(particle);
+  }
+}
 
 const feGaussianBlur = document.querySelector("feGaussianBlur");
 const feColorMatrix = document.querySelector("feColorMatrix");
@@ -93,20 +108,9 @@ const y = 100;
 const radius = 50;
 
 const particle = new Particle(x, y, radius);
-const TOTAL = 20;
 const randomNumBetween = (min, max) => {
   return Math.random() * (max - min + 1) + min;
 };
-
-let particles = [];
-for (let i = 0; i < TOTAL; i++) {
-  const x = randomNumBetween(0, canvasWidth);
-  const y = randomNumBetween(0, canvasHeight);
-  const radius = randomNumBetween(50, 100);
-  const vy = randomNumBetween(1, 5);
-  const particle = new Particle(x, y, radius, vy);
-  particles.push(particle);
-}
 
 let interval = 1000 / 60; // 60 fps를 타겟으로
 let now, delta;
@@ -133,5 +137,12 @@ function animate() {
   });
   then - now - (delta % interval);
 }
+window.addEventListener("load", () => {
+  init();
+  animate();
+});
 
+window.addEventListener("resize", () => {
+  init();
+});
 animate();
